@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="{% static 'converter/style.css' %}" />
+  </head>
+  <body>
+    <h1>WesCurrex Converter</h1>
+    <form method="POST" action="{% url 'convert_currency' %}">
+      {% csrf_token %}
+      <label for="base_currency">Base Currency:</label>
+      <input type="text" id="base_currency" name="base_currency" required />
+
+      <label for="target_currency">Target Currency:</label>
+      <input type="text" id="target_currency" name="target_currency" required />
+
+      <label for="amount">Amount:</label>
+      <input type="number" id="amount" name="amount" required />
+
+      <button type="submit">Convert</button>
+    </form>
+
+    <div id="result"></div>
+
+    <div class="contact-info">
+      <p>Contact: +254111964429</p>
+      <br />
+      <p>Email: eugenewesonga65@gmail.com</p>
+    </div>
+
+    <script>
+      // Handle the form submission
+      document.querySelector("form").onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+
+        const response = await fetch("{% url 'convert_currency' %}", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        const resultDiv = document.getElementById("result");
+
+        if (response.ok) {
+          resultDiv.innerHTML = `<p>Converted Amount: ${data.converted_amount}</p>
+                                       <p>Exchange Rate: ${data.rate}</p>`;
+        } else {
+          resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+        }
+      };
+    </script>
+  </body>
+</html>
